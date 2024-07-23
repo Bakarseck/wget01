@@ -1,4 +1,4 @@
-module wget
+module github.com/Bakarseck/wget01
 
 go 1.21.1
 

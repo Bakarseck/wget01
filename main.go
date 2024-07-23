@@ -1,9 +1,9 @@
 package main
 
 import (
-    "wget/cmd"
+	"github.com/Bakarseck/wget01/cmd"
 )
 
 func main() {
-    cmd.Execute()
+	cmd.Execute()
 }
