@@ -59,8 +59,8 @@
   - [ ] Implement `--convert-links` flag to convert links for offline viewing
 
 ## Task 10: Testing and Refinement @bakseck, @sefaye, @bcoulibaly
-- [ ] Test basic download functionality
-- [ ] Test output filename flag functionality
+- [x] Test basic download functionality
+- [x] Test output filename flag functionality
 - [ ] Test directory path flag functionality
 - [ ] Test rate limit flag functionality
 - [ ] Test background download functionality

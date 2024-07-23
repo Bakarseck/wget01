@@ -1,0 +1,2 @@
+Output will be written to "wget-log".
+Failed to start background download: fork/exec /tmp/go-build2307035212/b001/exe/wget01: no such file or directory
