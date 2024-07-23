@@ -61,9 +61,9 @@
 ## Task 10: Testing and Refinement @bakseck, @sefaye, @bcoulibaly
 - [x] Test basic download functionality
 - [x] Test output filename flag functionality
+- [x] Test background download functionality
 - [ ] Test directory path flag functionality
 - [ ] Test rate limit flag functionality
-- [ ] Test background download functionality
 - [ ] Test multiple file download functionality
 - [ ] Test website mirroring functionality
 - [ ] Refine code based on test results
