@@ -116,6 +116,13 @@ func downloadFile(url string) {
 		}
 	}
 	if filePath != "" {
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			err := os.MkdirAll(filePath, 0755)
+			if err != nil {
+				logEntry(fmt.Sprintf("Error creating directory: %s\n", err))
+				os.Exit(1)
+			}
+		}
 		fileName = filePath + "/" + fileName
 	}
 	logEntry(fmt.Sprintf("Saving to: ‘%s’\n\n", fileName))
