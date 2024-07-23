@@ -14,20 +14,20 @@
   - [x] Set up the root command with Cobra
 
 ## Task 3: Implement Basic File Download @bakseck
-- [ ] Add logic to handle URL input
-  - [ ] Ensure the URL argument is provided
-  - [ ] Fetch the URL content using `http.Get`
-- [ ] Add logic to save the downloaded content to a file
-  - [ ] Create a file to save the content
-  - [ ] Use `io.Copy` to write the response body to the file
-- [ ] Add logic to display download start and end times
-  - [ ] Print start time before download
-  - [ ] Print end time after download
+- [x] Add logic to handle URL input
+  - [x] Ensure the URL argument is provided
+  - [x] Fetch the URL content using `http.Get`
+- [x] Add logic to save the downloaded content to a file
+  - [x] Create a file to save the content
+  - [x] Use `io.Copy` to write the response body to the file
+- [x] Add logic to display download start and end times
+  - [x] Print start time before download
+  - [x] Print end time after download
 
 ## Task 4: Implement Output Filename Flag @bakseck
-- [ ] Add an output filename flag to the root command
-  - [ ] Define a `--output` or `-O` flag in `root.go`
-  - [ ] Use the provided filename to save the downloaded content
+- [x] Add an output filename flag to the root command
+  - [x] Define a `--output` or `-O` flag in `root.go`
+  - [x] Use the provided filename to save the downloaded content
 
 ## Task 5: Implement Directory Path Flag @bakseck
 - [ ] Add a directory path flag to the root command
@@ -40,9 +40,9 @@
   - [ ] Implement logic to control the download speed based on the provided rate limit
 
 ## Task 7: Implement Background Download Flag @bakseck
-- [ ] Add a background download flag to the root command
-  - [ ] Define a `--background` or `-B` flag in `root.go`
-  - [ ] Implement logic to run the download in the background and log output to a file
+- [x] Add a background download flag to the root command
+  - [x] Define a `--background` or `-B` flag in `root.go`
+  - [x] Implement logic to run the download in the background and log output to a file
 
 ## Task 8: Implement Multiple File Download @sefaye
 - [ ] Add a flag for downloading multiple files
