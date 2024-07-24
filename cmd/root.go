@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -45,7 +47,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&filePath, "path", "P", "", "Specify the directory to save the downloaded file")
 	rootCmd.Flags().StringVarP(&rateLimit, "rate-limit", "r", "", "Limit the download speed (e.g., 400k or 2M)")
 	rootCmd.Flags().BoolVarP(&background, "background", "B", false, "Download the file in the background")
-	rootCmd.Flags().StringVarP(&input, "input", "i", "", "Downloading different files should be possible")
+	rootCmd.Flags().StringVarP(&input, "input", "i", "", "Downloading different files should be possible asynchronously")
 }
 
 func handleArguments(args []string) {
@@ -87,7 +89,7 @@ func handleArguments(args []string) {
 		}()
 
 		for msg := range ch {
-			fmt.Println(msg)
+			logEntry(msg)
 		}
 		return
 	}
@@ -173,6 +175,26 @@ func downloadFile(url string) {
 		}
 		fileName = filePath + "/" + fileName
 	}
+	var limitInt int64
+	if rateLimit != "" {
+		match, _ := regexp.MatchString(`^\d+[kKmM]$`, rateLimit)
+
+		if !match {
+			logEntry("Error rate limit value: (e.g.,200K, 400k or 2M)\n")
+			os.Exit(1)
+		}
+		limitStr := rateLimit[:len(rateLimit)-1]
+		unit := rateLimit[len(rateLimit)-1:]
+		limitInt, _ = strconv.ParseInt(limitStr, 10, 64)
+		if unit == "k" || unit == "K" {
+			limitInt *= 1000
+		} else {
+			limitInt *= 10000
+		}
+
+		fmt.Println(limitInt, unit)
+	}
+
 	logEntry(fmt.Sprintf("Saving to: ‘%s’\n\n", fileName))
 
 	outFile, err := os.Create(fileName)
@@ -189,8 +211,13 @@ func downloadFile(url string) {
 		if n > 0 {
 			outFile.Write(buf[:n])
 			total += int64(n)
+			if rateLimit != "" && total > limitInt {
+				logEntry(fmt.Sprintf("\nSorry this file exceed octed rate of the bandwidth, limited at: %d octed\n",limitInt ))
+				os.Exit(1)
+			}
 			logEntry(fmt.Sprintf("\r%s  %3d%%", fileName, int(float64(total)/float64(response.ContentLength)*100)))
 		}
+
 		if err == io.EOF {
 			break
 		}
@@ -219,25 +246,25 @@ func downloadFilesAsync(url string, filename string, wg *sync.WaitGroup, ch chan
 	// Envoyer une requête GET
 	resp, err := http.Get(url)
 	if err != nil {
-		ch <- fmt.Sprintf("Failed to download %s: %v", url, err)
+		ch <- fmt.Sprintf("Failed to download %s\n: %v", url, err)
 		return
 	}
 	defer resp.Body.Close()
-
 	// Créer un fichier pour écrire le contenu
+
 	file, err := os.Create(filename)
 	if err != nil {
-		ch <- fmt.Sprintf("Failed to create file %s: %v", filename, err)
+		ch <- fmt.Sprintf("Failed to create file %s: %v\n", filename, err)
 		return
 	}
 	defer file.Close()
 
 	// Copier le contenu de la réponse HTTP dans le fichier
-	_, err = io.Copy(file, resp.Body)
-	if err != nil {
-		ch <- fmt.Sprintf("Failed to write to file %s: %v", filename, err)
+	_, err1 := io.Copy(file, resp.Body)
+	if err1 != nil {
+		ch <- fmt.Sprintf("Failed to write to file %s: %v\n", filename, err)
 		return
 	}
 
-	ch <- fmt.Sprintf("Successfully downloaded %s ", filename)
+	ch <- fmt.Sprintf("Successfully downloaded %s\n", filename)
 }

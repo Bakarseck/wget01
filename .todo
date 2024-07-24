@@ -34,10 +34,10 @@
   - [ ] Define a `--path` or `-P` flag in `root.go`
   - [ ] Use the provided path to save the downloaded content
 
-## Task 6: Implement Rate Limit Flag @bcoulibaly
-- [ ] Add a rate limit flag to the root command
-  - [ ] Define a `--rate-limit` flag in `root.go`
-  - [ ] Implement logic to control the download speed based on the provided rate limit
+## Task 6: Implement Rate Limit Flag @sefaye
+- [x] Add a rate limit flag to the root command
+  - [x] Define a `--rate-limit` flag in `root.go`
+  - [x] Implement logic to control the download speed based on the provided rate limit
 
 ## Task 7: Implement Background Download Flag @bakseck
 - [x] Add a background download flag to the root command
