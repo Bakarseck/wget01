@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -15,6 +17,7 @@ var (
 	output     string
 	filePath   string
 	rateLimit  string
+	input      string
 	background bool
 	content    string
 )
@@ -42,9 +45,52 @@ func init() {
 	rootCmd.Flags().StringVarP(&filePath, "path", "P", "", "Specify the directory to save the downloaded file")
 	rootCmd.Flags().StringVarP(&rateLimit, "rate-limit", "r", "", "Limit the download speed (e.g., 400k or 2M)")
 	rootCmd.Flags().BoolVarP(&background, "background", "B", false, "Download the file in the background")
+	rootCmd.Flags().StringVarP(&input, "input", "i", "", "Downloading different files should be possible")
 }
 
 func handleArguments(args []string) {
+	if input != "" {
+		urls := make(map[string]string)
+		file, err := os.Open(input)
+		if err != nil {
+			logEntry(fmt.Sprintf("Error: %s\n", err))
+			os.Exit(1)
+		}
+		scanner := bufio.NewScanner(file)
+		lineRead := false
+		for scanner.Scan() {
+			url := scanner.Text()
+			if url != "" {
+				urlParts := strings.Split(url, "/")
+				file := urlParts[len(urlParts)-1]
+				urls[url] = file
+				lineRead = true
+			}
+		}
+
+		if !lineRead {
+			logEntry("The file is empty")
+			os.Exit(1)
+		}
+
+		var wg sync.WaitGroup
+		ch := make(chan string)
+
+		for url, filename := range urls {
+			wg.Add(1)
+			go downloadFilesAsync(url, filename, &wg, ch)
+		}
+
+		go func() {
+			wg.Wait()
+			close(ch)
+		}()
+
+		for msg := range ch {
+			fmt.Println(msg)
+		}
+		return
+	}
 	if len(args) < 1 {
 		fmt.Println("URL is required")
 		os.Exit(1)
@@ -77,7 +123,9 @@ func writeLog() {
 		os.Exit(1)
 	}
 }
+
 func downloadFile(url string) {
+
 	startTime := time.Now().Format("2006-01-02 15:04:05")
 	logEntry(fmt.Sprintf("--%s--  %s\n", startTime, url))
 
@@ -163,4 +211,33 @@ func logEntry(entry string) {
 	} else {
 		fmt.Print(entry)
 	}
+}
+
+func downloadFilesAsync(url string, filename string, wg *sync.WaitGroup, ch chan<- string) {
+	defer wg.Done()
+
+	// Envoyer une requête GET
+	resp, err := http.Get(url)
+	if err != nil {
+		ch <- fmt.Sprintf("Failed to download %s: %v", url, err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Créer un fichier pour écrire le contenu
+	file, err := os.Create(filename)
+	if err != nil {
+		ch <- fmt.Sprintf("Failed to create file %s: %v", filename, err)
+		return
+	}
+	defer file.Close()
+
+	// Copier le contenu de la réponse HTTP dans le fichier
+	_, err = io.Copy(file, resp.Body)
+	if err != nil {
+		ch <- fmt.Sprintf("Failed to write to file %s: %v", filename, err)
+		return
+	}
+
+	ch <- fmt.Sprintf("Successfully downloaded %s ", filename)
 }
