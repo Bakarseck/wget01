@@ -13,7 +13,8 @@ mkdir -p "$download_directory"
 for i in $(seq -f "%03g" 1 114)
 do
     file_url="${base_url}${i}.mp3"
-    wget -P "$download_directory" "$file_url"
+    echo $file_url
+    # wget -P "$download_directory" "$file_url"
 done
 
 echo "Téléchargement terminé."
