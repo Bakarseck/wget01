@@ -45,9 +45,9 @@
   - [x] Implement logic to run the download in the background and log output to a file
 
 ## Task 8: Implement Multiple File Download @sefaye
-- [ ] Add a flag for downloading multiple files
-  - [ ] Define a `--input` or `-i` flag to accept a file with multiple URLs
-  - [ ] Implement logic to read URLs from the input file and download them asynchronously
+- [x] Add a flag for downloading multiple files
+  - [x] Define a `--input` or `-i` flag to accept a file with multiple URLs
+  - [x] Implement logic to read URLs from the input file and download them asynchronously
 
 ## Task 9: Implement Website Mirroring @bcoulibaly
 - [ ] Add a flag for mirroring a website
