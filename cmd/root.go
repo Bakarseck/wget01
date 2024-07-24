@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
@@ -51,6 +52,11 @@ func init() {
 }
 
 func handleArguments(args []string) {
+	if background {
+		runInBackground(args)
+		return
+	}
+
 	if input != "" {
 		urls := make(map[string]string)
 		file, err := os.Open(input)
@@ -100,15 +106,26 @@ func handleArguments(args []string) {
 
 	url := args[0]
 
-	if background {
-		fmt.Println("Output will be written to wget-log")
-	}
-
 	downloadFile(url)
 
 	if background {
 		writeLog()
 	}
+}
+
+func runInBackground(args []string) {
+	cmd := exec.Command(os.Args[0], args...)
+	cmd.Stdout = nil
+	cmd.Stderr = nil
+	cmd.Stdin = nil
+	err := cmd.Start()
+	if err != nil {
+		fmt.Println("Failed to start in background:", err)
+		os.Exit(1)
+	}
+	fmt.Println("Running in background with PID", cmd.Process.Pid)
+	fmt.Println("Output will be written in wget-log", cmd.Process.Pid)
+	os.Exit(0)
 }
 
 func writeLog() {
@@ -212,7 +229,7 @@ func downloadFile(url string) {
 			outFile.Write(buf[:n])
 			total += int64(n)
 			if rateLimit != "" && total > limitInt {
-				logEntry(fmt.Sprintf("\nSorry this file exceed octed rate of the bandwidth, limited at: %d octed\n",limitInt ))
+				logEntry(fmt.Sprintf("\nSorry this file exceed octed rate of the bandwidth, limited at: %d octed\n", limitInt))
 				os.Exit(1)
 			}
 			logEntry(fmt.Sprintf("\r%s  %3d%%", fileName, int(float64(total)/float64(response.ContentLength)*100)))
