@@ -180,7 +180,7 @@ func downloadFile(url string) {
 		match, _ := regexp.MatchString(`^\d+[kKmM]$`, rateLimit)
 
 		if !match {
-			logEntry("Error rate limit value: (e.g.,200K, 400k or 2M)\n")
+			logEntry("Error rate limit value: (e.g.,200K,1m, 400k or 2M)\n")
 			os.Exit(1)
 		}
 		limitStr := rateLimit[:len(rateLimit)-1]
