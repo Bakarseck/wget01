@@ -193,7 +193,9 @@ func downloadFile(url string) {
 		fileName = filePath + "/" + fileName
 	}
 	var limitInt int64
+	var delay float64
 	if rateLimit != "" {
+		fmt.Println(rateLimit)
 		match, _ := regexp.MatchString(`^\d+[kKmM]$`, rateLimit)
 
 		if !match {
@@ -204,11 +206,13 @@ func downloadFile(url string) {
 		unit := rateLimit[len(rateLimit)-1:]
 		limitInt, _ = strconv.ParseInt(limitStr, 10, 64)
 		if unit == "k" || unit == "K" {
-			limitInt *= 1000
+			limitInt *= 1024
+		} else if unit == "m" || unit == "M" {
+			limitInt *= 1024000
 		} else {
-			limitInt *= 10000
+			limitInt *= 1024000000
 		}
-
+		delay = (float64(1024) / float64(limitInt)) * float64(time.Second)
 		fmt.Println(limitInt, unit)
 	}
 
@@ -223,18 +227,22 @@ func downloadFile(url string) {
 
 	buf := make([]byte, 1024)
 	var total int64
+	//star := time.Now()
 	for {
 		n, err := response.Body.Read(buf)
 		if n > 0 {
 			outFile.Write(buf[:n])
 			total += int64(n)
-			if rateLimit != "" && total > limitInt {
-				logEntry(fmt.Sprintf("\nSorry this file exceed octed rate of the bandwidth, limited at: %d octed\n", limitInt))
-				os.Exit(1)
+			
+			
+			if rateLimit != "" {
+				time.Sleep(time.Duration(delay))
 			}
+			// pour tester le rate-limit
+			// elapsed := time.Since(star)
+			// fmt.Println(total, rateLimit, time.Duration(delay),elapsed)
 			logEntry(fmt.Sprintf("\r%s  %3d%%", fileName, int(float64(total)/float64(response.ContentLength)*100)))
 		}
-
 		if err == io.EOF {
 			break
 		}
