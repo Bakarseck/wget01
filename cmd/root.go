@@ -227,21 +227,22 @@ func downloadFile(url string) {
 
 	buf := make([]byte, 1024)
 	var total int64
+	var load string
 	//star := time.Now()
 	for {
 		n, err := response.Body.Read(buf)
 		if n > 0 {
 			outFile.Write(buf[:n])
 			total += int64(n)
-			
-			
+			load += "="
+
 			if rateLimit != "" {
 				time.Sleep(time.Duration(delay))
 			}
 			// pour tester le rate-limit
 			// elapsed := time.Since(star)
 			// fmt.Println(total, rateLimit, time.Duration(delay),elapsed)
-			logEntry(fmt.Sprintf("\r%s  %3d%%", fileName, int(float64(total)/float64(response.ContentLength)*100)))
+			logEntry(fmt.Sprintf("\r%s  %3d%% [%s]", fileName, int(float64(total)/float64(response.ContentLength)*100),load))
 		}
 		if err == io.EOF {
 			break
