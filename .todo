@@ -62,9 +62,9 @@
 - [x] Test basic download functionality
 - [x] Test output filename flag functionality
 - [x] Test background download functionality
-- [ ] Test directory path flag functionality
-- [ ] Test rate limit flag functionality
-- [ ] Test multiple file download functionality
+- [x] Test directory path flag functionality
+- [x] Test rate limit flag functionality
+- [x] Test multiple file download functionality
 - [ ] Test website mirroring functionality
 - [ ] Refine code based on test results
 - [ ] Ensure proper error handling and logging throughout the application

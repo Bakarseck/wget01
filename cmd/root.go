@@ -46,7 +46,7 @@ func Execute() {
 func init() {
 	rootCmd.Flags().StringVarP(&output, "output", "O", "", "Save the downloaded file under a different name")
 	rootCmd.Flags().StringVarP(&filePath, "path", "P", "", "Specify the directory to save the downloaded file")
-	rootCmd.Flags().StringVarP(&rateLimit, "rate-limit", "r", "", "Limit the download speed (e.g., 400k or 2M)")
+	rootCmd.Flags().StringVar(&rateLimit, "rate-limit", "", "Limit the download speed (e.g., 400k or 2M)")
 	rootCmd.Flags().BoolVarP(&background, "background", "B", false, "Download the file in the background")
 	rootCmd.Flags().StringVarP(&input, "input", "i", "", "Downloading different files should be possible asynchronously")
 }
@@ -242,7 +242,7 @@ func downloadFile(url string) {
 			// pour tester le rate-limit
 			// elapsed := time.Since(star)
 			// fmt.Println(total, rateLimit, time.Duration(delay),elapsed)
-			logEntry(fmt.Sprintf("\r%s  %3d%% [%s]", fileName, int(float64(total)/float64(response.ContentLength)*100),load))
+			logEntry(fmt.Sprintf("\r%s  %3d%% [%s]", fileName, int(float64(total)/float64(response.ContentLength)*100), load))
 		}
 		if err == io.EOF {
 			break
